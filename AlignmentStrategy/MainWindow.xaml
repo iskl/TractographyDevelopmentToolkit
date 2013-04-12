@@ -1,0 +1,59 @@
+﻿<Window x:Class="AlignmentStrategy.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:pt="clr-namespace:PropertyTools.Wpf;assembly=PropertyTools.Wpf"
+        Title="MainWindow" Height="600" Width="800" xmlns:h="http://helixtoolkit.codeplex.com" DataContext="{Binding}" WindowStartupLocation="CenterScreen">
+    <DockPanel>
+
+        <Menu HorizontalAlignment="Stretch" Margin="0" Name="menu1" VerticalAlignment="Stretch" DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Export"/>
+                <Separator/>
+                <MenuItem Header="Exit"/>
+            </MenuItem>
+            <MenuItem Header="Grid">
+                <MenuItem Header="Thickness">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Value="{Binding Thickness, ElementName=grid}" Minimum="0.01" Maximum="0.5" Width="200"/>
+                        <TextBlock Text="{Binding Thickness, StringFormat='{}{0:0.000}', ElementName=grid}"/>
+                    </StackPanel>
+                </MenuItem>
+                <MenuItem Header="Level">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Minimum="0" Maximum="31" Width="200" x:Name="slider_Level" ValueChanged="slider_Level_ValueChanged" />
+                        <TextBlock x:Name="textBlock_Level"/>
+                    </StackPanel>
+                </MenuItem>
+                <MenuItem IsCheckable="True" Header="ShowText" Name="showGridText" Click="showGridText_Click" />
+            </MenuItem>
+            <MenuItem Header="Show">
+                <MenuItem IsCheckable="True" Header="ShowArrows" IsChecked="{Binding ShowArrows}" />
+                <MenuItem IsCheckable="True" Header="ShowFibers" IsChecked="{Binding ShowFibers}" />
+                <MenuItem IsCheckable="True" Header="ShowDirections" IsChecked="{Binding ShowDirections}" />
+            </MenuItem>
+            <pt:EnumMenuItem SelectedValue="{Binding CameraMode, ElementName=helixViewport3D_Main}" Header="CameraMode"/>
+        </Menu>
+        <StatusBar DockPanel.Dock="Bottom">
+            <Label Content="Step:" Margin="0 0 4 0"/>
+            <Button Width="50" Height="20" Content="{Binding Step,Mode=TwoWay}" FontSize="10" Name="button_Step" Click="button_Step_Click" />
+            <Label Content="Trace:" Margin="0 0 4 0"/>
+            <Button Width="50" Height="20" Content="Trace" FontSize="10" />
+            <Label Content="ArrowDiameter:" Margin="0 0 4 0"/>
+            <Slider Name="slider_ArrowDiameter" Minimum="0.05" Maximum="0.15" Value="{Binding ArrowDiameter}" Width="100" HorizontalAlignment="Stretch" />
+            <TextBlock Text="{Binding Value, ElementName=slider_ArrowDiameter, StringFormat={}{0:0.000}}" Padding="4 0 4 0"/>
+        </StatusBar>
+        <Grid>
+            <h:HelixViewport3D Height="Auto" HorizontalAlignment="Stretch" Margin="0" Name="helixViewport3D_Main" VerticalAlignment="Stretch" Width="Auto" ItemsSource="{Binding}">
+                    <h:HelixViewport3D.Camera>
+                        <PerspectiveCamera Position="0,0,0" LookDirection="50,50,15" UpDirection="0,0,1" FieldOfView="100"/>
+                    </h:HelixViewport3D.Camera>
+                    <!-- Remember to add light to the scene -->
+                    <h:SunLight/>
+                    <!-- The content of this visual is defined in MainViewModel.cs -->
+                    <ModelVisual3D Content="{Binding Model}"/>
+                    <h:GridLinesVisual3D x:Name="grid" Width="100" Length="100" MinorDistance="1" MajorDistance="1" Thickness="0.05" Center="50,50,0" />
+            </h:HelixViewport3D>
+            <Canvas Name="overlay1" IsHitTestVisible="False" ClipToBounds="False" Visibility="Hidden"/>
+        </Grid>
+    </DockPanel>
+</Window>
