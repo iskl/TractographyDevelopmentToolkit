@@ -82,6 +82,19 @@
             }
         }
 
+        public String CurrentStatus
+        {
+            get
+            {
+                if(currentStatus == Status.NoFiber)
+                    return "NoFiber";
+                else if (currentStatus == Status.ReachEdge)
+                    return "ReachEdge";
+                else
+                    return "Tracking";
+            }
+        }
+
 
         private CrossData cross;
         private GeometryModel3D crossModel;
@@ -94,6 +107,7 @@
         private bool showArrows = true;
         private bool showDirections = true;
         private String step="0";
+        private Status currentStatus=Status.Tracking;
 
 
         /// <summary>
@@ -101,7 +115,7 @@
         /// </summary>
         public MainViewModel()
         {
-            cross = new CrossData(60, 0.1);
+            cross = new CrossData(60, 0.15);
             crossModel = new GeometryModel3D();
             fiberModel = new GeometryModel3D();
             directionModel = new GeometryModel3D();
@@ -174,6 +188,10 @@
                 int gridX = (int)(endNode.X + 0.5);
                 int gridY = (int)(endNode.Y + 0.5);
                 int gridZ = (int)(endNode.Z + 0.5);
+                if (gridX < 0 || gridX > 99 || gridY < 0 || gridY > 99 || gridZ < 0 || gridZ > 29)
+                {
+                    return;
+                }
                 int type = cross.Voxels[gridX, gridY, gridZ].Type;
 
                 for (int itype = 0; itype < type; itype++)
@@ -203,13 +221,16 @@
 
         private void stepForward()
         {
-
-            tracking.Step();
-
-            createFibers();
-
-            createDirections();
-
+            if (currentStatus == Status.Tracking)
+            {
+                currentStatus = tracking.Step();
+                if (currentStatus == Status.Tracking)
+                {
+                    createFibers();
+                    createDirections();
+                }
+            }
+            RaisePropertyChanged("CurrentStatus");
         }
 
         public void UpdateModel()

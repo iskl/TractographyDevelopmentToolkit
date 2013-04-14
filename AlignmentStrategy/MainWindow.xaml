@@ -36,7 +36,8 @@
         <StatusBar DockPanel.Dock="Bottom">
             <Label Content="Step:" Margin="0 0 4 0"/>
             <Button Width="50" Height="20" Content="{Binding Step,Mode=TwoWay}" FontSize="10" Name="button_Step" Click="button_Step_Click" />
-            <Label Content="Trace:" Margin="0 0 4 0"/>
+            <Label Content="Status:" Margin="0 0 4 0"/>
+            <Label Content="{Binding CurrentStatus}" Margin="0 0 4 0"/>
             <Button Width="50" Height="20" Content="Trace" FontSize="10" />
             <Label Content="ArrowDiameter:" Margin="0 0 4 0"/>
             <Slider Name="slider_ArrowDiameter" Minimum="0.05" Maximum="0.15" Value="{Binding ArrowDiameter}" Width="100" HorizontalAlignment="Stretch" />

@@ -73,6 +73,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AlignmentTracking.cs" />
+    <Compile Include="Enum.cs" />
     <Compile Include="Fiber.cs" />
     <Compile Include="Overlay.cs" />
     <Compile Include="Voxel.cs" />
