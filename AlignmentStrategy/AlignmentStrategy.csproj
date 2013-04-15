@@ -36,18 +36,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HelixToolkit.Wpf">
-      <HintPath>..\..\..\..\CSharp\HelixToolkit\HelixToolkit.Wpf.dll</HintPath>
+    <Reference Include="HelixToolkit.Wpf, Version=2013.1.10.1, Culture=neutral, PublicKeyToken=52aa3500039caf0d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
-    <Reference Include="HelixToolkit.Wpf.Input">
-      <HintPath>..\..\..\..\CSharp\HelixToolkit\HelixToolkit.Wpf.Input.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
+    <Reference Include="HelixToolkit.Wpf.Input, Version=2013.1.10.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\HelixToolkit.Wpf.Input.dll</HintPath>
     </Reference>
-    <Reference Include="PropertyTools">
-      <HintPath>..\..\..\..\CSharp\HelixToolkit\PropertyTools\PropertyTools.dll</HintPath>
+    <Reference Include="PropertyTools, Version=2012.4.22.1, Culture=neutral, PublicKeyToken=ea0c9f2b460934d0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\PropertyTools.dll</HintPath>
     </Reference>
-    <Reference Include="PropertyTools.Wpf">
-      <HintPath>..\..\..\..\CSharp\HelixToolkit\PropertyTools\PropertyTools.Wpf.dll</HintPath>
+    <Reference Include="PropertyTools.Wpf, Version=2012.4.22.1, Culture=neutral, PublicKeyToken=ea0c9f2b460934d0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\PropertyTools.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -59,9 +62,10 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="TDx.TDxInput">
-      <HintPath>..\..\..\..\CSharp\HelixToolkit\TDx.TDxInput.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
+    <Reference Include="TDx.TDxInput, Version=1.1.0.0, Culture=neutral, PublicKeyToken=3bbf7d14b78dc9f5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\lib\TDx.TDxInput.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
