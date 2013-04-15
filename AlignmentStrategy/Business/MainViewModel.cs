@@ -96,8 +96,8 @@
         }
 
 
-        private CrossData cross;
-        private GeometryModel3D crossModel;
+        private Data data;
+        private GeometryModel3D dataModel;
         private GeometryModel3D fiberModel;
         private GeometryModel3D directionModel;
         private AlignmentTracking tracking;
@@ -115,11 +115,13 @@
         /// </summary>
         public MainViewModel()
         {
-            cross = new CrossData(60, 0.15);
-            crossModel = new GeometryModel3D();
+            data = new CrossData(60, 0.15);
+            //data = new RingData(0.1);
+            dataModel = new GeometryModel3D();
             fiberModel = new GeometryModel3D();
             directionModel = new GeometryModel3D();
-            tracking = new AlignmentTracking(cross.Voxels, new Point3D(50,0,15));
+            tracking = new AlignmentTracking(data.Voxels, new Point3D(50,0,15));
+            //tracking = new AlignmentTracking(data.Voxels, new Point3D(25,50,15));
 
             createArrows();
             createDirections();
@@ -137,18 +139,13 @@
             {
                 for (int j = 0; j < 100; j++)
                 {
-                    int type = cross[i, j, k].Type;
+                    int type = data[i, j, k].Type;
                     for (int itype = 0; itype < type; itype++)
                     {
                         meshBuilder.AddArrow
                         (
                             new Point3D(i, j, k),
-                            new Point3D
-                            (
-                                i + cross[i, j, k].Directions[itype].X,
-                                j + cross[i, j, k].Directions[itype].Y,
-                                k + cross[i, j, k].Directions[itype].Z
-                            ),
+                            data[i, j, k].Directions[itype].Add(i,j,k),
                             arrowDiameter,
                             5
                         );
@@ -156,7 +153,7 @@
                 }//forj
             }//fori
 
-            crossModel = new GeometryModel3D
+            dataModel = new GeometryModel3D
             {
                 Geometry = meshBuilder.ToMesh(true),
                 Material = MaterialHelper.CreateMaterial(Colors.Green),
@@ -192,19 +189,14 @@
                 {
                     return;
                 }
-                int type = cross.Voxels[gridX, gridY, gridZ].Type;
+                int type = data.Voxels[gridX, gridY, gridZ].Type;
 
                 for (int itype = 0; itype < type; itype++)
                 {
                     meshBuilder.AddArrow
                     (
-                        new Point3D(endNode.X, endNode.Y, endNode.Z),
-                        new Point3D
-                        (
-                            endNode.X + cross[gridX, gridY, gridZ].Directions[itype].X,
-                            endNode.Y + cross[gridX, gridY, gridZ].Directions[itype].Y,
-                            endNode.Z + cross[gridX, gridY, gridZ].Directions[itype].Z
-                        ),
+                        endNode,
+                        endNode.Add(data[gridX, gridY, gridZ].Directions[itype]),
                         arrowDiameter,
                         5
                     );
@@ -237,7 +229,7 @@
         {
             var modelGroup = new Model3DGroup();
 
-            if(showArrows) modelGroup.Children.Add(crossModel);
+            if(showArrows) modelGroup.Children.Add(dataModel);
             
             if(showFibers) modelGroup.Children.Add(fiberModel);
 

@@ -6,22 +6,8 @@ using System.Windows.Media.Media3D;
 
 namespace AlignmentStrategy
 {
-    class CrossData
+    class CrossData : Data
     {
-        private Voxel[, ,] voxels;
-
-        public Voxel[, ,] Voxels
-        {
-            get { return voxels; }
-            set { voxels = value; }
-        }
-
-        public Voxel this[int a, int b, int c]
-        {
-            get { return voxels[a, b, c]; }
-            set { voxels[a, b, c] = value; }
-        }
-
         public CrossData(double angle, double error)
         {
             voxels = new Voxel[100, 100, 30];

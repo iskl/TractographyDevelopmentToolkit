@@ -21,14 +21,14 @@ namespace AlignmentStrategy
         {
             voxels = v;
             fibers = new List<Fiber>();
-            int index=0;
-            int j=0;
-            for(int k=1;k>=-1;k--)
+            int index = 0;
+            int j = 0;
+            for (int k = 1; k >= -1; k--)
             {
-                for(int i=-1;i<=1;i++)
+                for (int i = -1; i <= 1; i++)
                 {
                     fibers.Add(new Fiber());
-                    fibers[index].Node.Add(new Point3D(startPoint.X+i,startPoint.Y+j,startPoint.Z+k));
+                    fibers[index].Node.Add(startPoint.Add(i, j, k));
                     index++;
                 }
             }
@@ -44,7 +44,7 @@ namespace AlignmentStrategy
             {
                 currentNode.Add(fibers[i].Node.Last<Point3D>());
 
-                int fiberLength=fibers[i].Node.Count;
+                int fiberLength = fibers[i].Node.Count;
                 if (fiberLength == 1)
                 {
                     lastNode.Add(fibers[i].Node[0]);//first step
@@ -67,16 +67,14 @@ namespace AlignmentStrategy
                 {
                     return Status.NoFiber;
                 }
-                List<Point3D> nextNodeCandidates =new List<Point3D>(type);
+                List<Point3D> nextNodeCandidates = new List<Point3D>(type);
                 List<double> angle = new List<double>(type);
                 for (int itype = 0; itype < type; itype++)
                 {
-                    nextNodeCandidates.Add(new Point3D
+                    nextNodeCandidates.Add
                     (
-                        currentNode[i].X + voxels[gridX, gridY, gridZ].Directions[itype].X,
-                        currentNode[i].Y + voxels[gridX, gridY, gridZ].Directions[itype].Y,
-                        currentNode[i].Z + voxels[gridX, gridY, gridZ].Directions[itype].Z
-                    ));
+                        currentNode[i].Add(voxels[gridX, gridY, gridZ].Directions[itype])
+                    );
                     angle.Add(corner(lastNode[i], currentNode[i], nextNodeCandidates[itype]));
                 }
                 int minIndex = angle.IndexOf(angle.Min());
@@ -86,14 +84,26 @@ namespace AlignmentStrategy
             List<Point3D> vectors = new List<Point3D>(fibers.Count);
             for (int i = 0; i < fibers.Count; i++)
             {
-                vectors.Add(new Point3D(nextNode[i].X - currentNode[i].X, nextNode[i].Y - currentNode[i].Y, nextNode[i].Z - currentNode[i].Z));
+                vectors.Add(nextNode[i].Substract(currentNode[i]));
             }
 
+            double threshold = 0.2;
+            switch (nextType[5])
+            {
+                case 0:
+                case 1:
+                    threshold = 0.2;
+                    break;
+                case 2:
+                default:
+                    threshold = 0.1;
+                    break;
+            }
             while (true)
             {
                 if (vectors.Count < 2)
                     break;
-                
+
                 double[,] matrix = new double[vectors.Count, vectors.Count];
                 for (int i = 0; i < vectors.Count; i++)
                 {
@@ -120,12 +130,12 @@ namespace AlignmentStrategy
                         }
                     }
                 }
-                if (minElement < 0.2)
+                if (minElement < threshold)
                 {
-                    vectors[minIndexA] = new Point3D(vectors[minIndexA].X + vectors[minIndexB].X, vectors[minIndexA].Y + vectors[minIndexB].Y, vectors[minIndexA].Z + vectors[minIndexB].Z);
+                    vectors[minIndexA] = vectors[minIndexA].Add(vectors[minIndexB]);
                     vectors.RemoveAt(minIndexB);
                 }
-                else 
+                else
                     break;
             }
 
@@ -133,24 +143,51 @@ namespace AlignmentStrategy
             int maxIndex = -1;
             for (int i = 0; i < vectors.Count; i++)
             {
-                if (getLength(vectors[i]) > maxLength)
+                if (vectors[i].GetLength() > maxLength)
                 {
-                    maxLength = getLength(vectors[i]);
+                    maxLength = vectors[i].GetLength();
                     maxIndex = i;
                 }
             }
             Point3D forward = vectors[maxIndex];
-
-            double e = Math.Sqrt(forward.X * forward.X + forward.Y * forward.Y + forward.Z * forward.Z);
-            forward.X /= e;
-            forward.Y /= e;
-            forward.Z /= e;
-
+            forward = forward.GetNormal();
+            Point3D center = currentNode[5].Add(forward);
 
             for (int i = 0; i < fibers.Count; i++)
             {
-                //fibers[i].Node.Add(nextNode[i]);//Streamline
-                fibers[i].Node.Add(new Point3D(currentNode[i].X + forward.X, currentNode[i].Y + forward.Y, currentNode[i].Z + forward.Z));//Streamline
+                Point3D adjustedForward = new Point3D(0, 0, 0);
+                //Streamline
+                //fibers[i].Node.Add(nextNode[i]);
+
+                //AlignmentTracking 1
+                //fibers[i].Node.Add(currentNode[i].Add(forward));
+
+                //AlignmentTracking 2
+                double A = forward.X; double B = forward.Y; double C = forward.Z;
+                double X = center.X; double Y = center.Y; double Z = center.Z;
+                double D = (-1) * (A * X + B * Y + C * Z);//plane: Ax+By+Cz+D=0
+
+                double lastDelta = 10000;
+                while (true)
+                {
+                    adjustedForward = adjustedForward.Add(forward.Multiply(0.05));
+                    double delta = Math.Abs(
+                    (
+                        currentNode[i].Add(adjustedForward).X * A
+                        +
+                        currentNode[i].Add(adjustedForward).Y * B
+                        +
+                        currentNode[i].Add(adjustedForward).Z * C
+                        +
+                        D
+                    )
+                    /
+                    Math.Sqrt(A * A + B * B + C * C));
+                    if (delta > lastDelta)
+                        break;
+                    lastDelta = delta;
+                }
+                fibers[i].Node.Add(currentNode[i].Add(adjustedForward));
             }
 
             return Status.Tracking;
@@ -158,11 +195,9 @@ namespace AlignmentStrategy
 
         private double corner(Point3D lastNode, Point3D currentNode, Point3D nextNode)
         {
-            Point3D a = new Point3D(currentNode.X - lastNode.X, currentNode.Y - lastNode.Y, currentNode.Z - lastNode.Z);
-            Point3D b = new Point3D(nextNode.X - currentNode.X, nextNode.Y - currentNode.Y, nextNode.Z - currentNode.Z);
-            double numerator = a.X * b.X + a.Y * b.Y + a.Z * b.Z;
-            double denominator = Math.Sqrt(a.X * a.X + a.Y * a.Y + a.Z * a.Z) * Math.Sqrt(b.X * b.X + b.Y * b.Y + b.Z * b.Z);
-            return Math.Acos(numerator / denominator);
+            Point3D a = currentNode.Substract(lastNode);
+            Point3D b = nextNode.Substract(currentNode);
+            return corner(a, b);
         }
 
         private double corner(Point3D a, Point3D b)
@@ -170,11 +205,6 @@ namespace AlignmentStrategy
             double numerator = a.X * b.X + a.Y * b.Y + a.Z * b.Z;
             double denominator = Math.Sqrt(a.X * a.X + a.Y * a.Y + a.Z * a.Z) * Math.Sqrt(b.X * b.X + b.Y * b.Y + b.Z * b.Z);
             return Math.Acos(numerator / denominator);
-        }
-
-        private double getLength(Point3D a)
-        {
-            return Math.Sqrt(a.X * a.X + a.Y * a.Y + a.Z * a.Z);
         }
     }
 }
