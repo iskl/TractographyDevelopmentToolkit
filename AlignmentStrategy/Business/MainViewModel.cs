@@ -115,13 +115,13 @@
         /// </summary>
         public MainViewModel()
         {
-            data = new CrossData(60, 0.15);
-            //data = new RingData(0.1);
+            //data = new CrossData(60, 0.15);
+            data = new RingData(0.1);
             dataModel = new GeometryModel3D();
             fiberModel = new GeometryModel3D();
             directionModel = new GeometryModel3D();
-            tracking = new AlignmentTracking(data.Voxels, new Point3D(50,0,15));
-            //tracking = new AlignmentTracking(data.Voxels, new Point3D(25,50,15));
+            //tracking = new AlignmentTracking(data.Voxels, new Point3D(50,0,15));
+            tracking = new AlignmentTracking(data.Voxels, new Point3D(25,50,15));
 
             createArrows();
             createDirections();

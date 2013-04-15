@@ -13,6 +13,7 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using HelixToolkit.Wpf;
+using Microsoft.Win32;
 
 namespace AlignmentStrategy
 {
@@ -82,6 +83,49 @@ namespace AlignmentStrategy
         {
             int value= Convert.ToInt32(button_Step.Content);
             button_Step.Content = (value + 1).ToString();
+        }
+
+        private void menuItem_Export_Click(object sender, RoutedEventArgs e)
+        {
+            var d = new SaveFileDialog();
+            d.Filter = "obj files(*.obj)|*.obj";
+            d.DefaultExt = Exporters.DefaultExtension;
+            if (!d.ShowDialog().Value)
+            {
+                return;
+            }
+
+            try
+            {
+                Viewport3DHelper.Export(helixViewport3D_Main.Viewport, d.FileName);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        private void menuItem_Import_Click(object sender, RoutedEventArgs e)
+        {
+            var d = new OpenFileDialog();
+            d.Filter = "obj files(*.obj)|*.obj";
+            if (!d.ShowDialog().Value)
+            {
+                return;
+            }
+            try
+            {
+                ModelImporter.Load(d.FileName);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        private void menuItem_Exit_Click(object sender, RoutedEventArgs e)
+        {
+            App.Current.Shutdown();
         }
     }
 }

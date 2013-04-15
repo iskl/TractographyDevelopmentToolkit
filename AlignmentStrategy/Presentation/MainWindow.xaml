@@ -7,9 +7,10 @@
 
         <Menu HorizontalAlignment="Stretch" Margin="0" Name="menu1" VerticalAlignment="Stretch" DockPanel.Dock="Top">
             <MenuItem Header="File">
-                <MenuItem Header="Export"/>
+                <MenuItem Header="Import" Name="menuItem_Import" Click="menuItem_Import_Click" />
+                <MenuItem Header="Export" Name="menuItem_Export" Click="menuItem_Export_Click" />
                 <Separator/>
-                <MenuItem Header="Exit"/>
+                <MenuItem Header="Exit" Name="menuItem_Exit" Click="menuItem_Exit_Click" />
             </MenuItem>
             <MenuItem Header="Grid">
                 <MenuItem Header="Thickness">
